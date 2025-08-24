@@ -1,7 +1,6 @@
 """Test that all required imports work correctly."""
 
 
-
 def test_core_imports():
     """Test that core dependencies can be imported."""
     import numpy as np
