@@ -1,0 +1,75 @@
+name: XFusion Ultra-Lite CI
+
+on:
+  push:
+    branches: [ main, feature/ultra-lite ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-cpu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+    
+    - name: Lint with ruff
+      run: |
+        ruff check xfusion_lite.py tests/
+    
+    - name: Format check with black
+      run: |
+        black --check xfusion_lite.py tests/
+    
+    - name: Test with pytest (CPU only)
+      run: |
+        pytest -v -m "not gpu" tests/
+    
+    - name: Test CLI validation
+      run: |
+        python xfusion_lite.py validate
+    
+    - name: Test CLI inference
+      run: |
+        python xfusion_lite.py infer-synthetic
+
+  test-gpu:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+    
+    - name: Check GPU availability and run GPU tests
+      run: |
+        python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
+        if python -c "import torch; exit(0 if torch.cuda.is_available() else 1)"; then
+          echo "GPU available, running GPU tests"
+          pytest -v -m "gpu" tests/
+        else
+          echo "No GPU available, skipping GPU tests"
+        fi
