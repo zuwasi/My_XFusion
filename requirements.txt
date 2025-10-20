@@ -1,8 +1,8 @@
 # XFusion Ultra-Lite Requirements (Python 3.13 compatible)
 # Core inference dependencies
 
-torch>=2.9.0
-torchvision>=0.22.0
+torch>=2.8.0
+torchvision>=0.21.0
 numpy>=2.2.1
 opencv-python>=4.10.0
 Pillow>=11.0.0
@@ -11,8 +11,7 @@ pandas>=2.2.3
 tqdm>=4.67.1
 natsort>=8.4.0
 
-# Development and testing  
-jupyter>=1.1.1
+# Development and testing
 pytest>=8.3.4
 ruff>=0.8.2
 black>=24.10.0
